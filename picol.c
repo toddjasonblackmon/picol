@@ -46,7 +46,9 @@ struct picolInterp {
 void picolInitParser(struct picolParser *p, char *text) {
     p->text = p->p = text;
     p->len = strlen(text);
-    p->start = 0; p->end = 0; p->insidequote = 0;
+    p->start = 0; 
+	p->end = 0; 
+	p->insidequote = 0;
     p->type = PT_EOL;
 }
 
@@ -62,8 +64,7 @@ int picolParseSep(struct picolParser *p) {
 
 int picolParseEol(struct picolParser *p) {
     p->start = p->p;
-    while(*p->p == ' ' || *p->p == '\t' || *p->p == '\n' || *p->p == '\r' ||
-          *p->p == ';')
+    while(*p->p == ' ' || *p->p == '\t' || *p->p == '\n' || *p->p == '\r' || *p->p == ';')
     {
         p->p++; p->len--;
     }
@@ -100,16 +101,15 @@ int picolParseCommand(struct picolParser *p) {
     return PICOL_OK;
 }
 
-int picolParseVar(struct picolParser *p) {
+int picolParseVar(struct picolParser *p) 
+{
     p->start = ++p->p; p->len--; /* skip the $ */
-    while(1) {
-        if ((*p->p >= 'a' && *p->p <= 'z') || (*p->p >= 'A' && *p->p <= 'Z') ||
-            (*p->p >= '0' && *p->p <= '9') || *p->p == '_')
-        {
-            p->p++; p->len--; continue;
-        }
-        break;
+    while ((*p->p >= 'a' && *p->p <= 'z') || (*p->p >= 'A' && *p->p <= 'Z') || 
+			(*p->p >= '0' && *p->p <= '9') || *p->p == '_') {
+            p->p++; 
+			p->len--;
     }
+
     if (p->start == p->p) { /* It's just a single char string "$" */
         p->start = p->end = p->p-1;
         p->type = PT_STR;
@@ -294,7 +294,8 @@ int picolRegisterCommand(struct picolInterp *i, char *name, picolCmdFunc f, void
 }
 
 /* EVAL! */
-int picolEval(struct picolInterp *i, char *t) {
+int picolEval(struct picolInterp *i, char *t) 
+{
     struct picolParser p;
     int argc = 0, j;
     char **argv = NULL;
@@ -307,9 +308,11 @@ int picolEval(struct picolInterp *i, char *t) {
         int tlen;
         int prevtype = p.type;
         picolGetToken(&p);
-        if (p.type == PT_EOF) break;
+        if (p.type == PT_EOF) 
+			break;
         tlen = p.end-p.start+1;
-        if (tlen < 0) tlen = 0;
+        if (tlen < 0) 
+			tlen = 0;
         t = malloc(tlen+1);
         memcpy(t, p.start, tlen);
         t[tlen] = '\0';
@@ -373,7 +376,8 @@ int picolEval(struct picolInterp *i, char *t) {
         prevtype = p.type;
     }
 err:
-    for (j = 0; j < argc; j++) free(argv[j]);
+    for (j = 0; j < argc; j++) 
+		free(argv[j]);
     free(argv);
     return retcode;
 }
