@@ -51,7 +51,7 @@ void picolInitParser(struct picolParser *p, char *text) {
 	p->type = PT_EOL;
 }
 
-int picolParseSep(struct picolParser *p) {
+int picolParseSep (struct picolParser *p) {
 	p->start = p->p;
 	while(*p->p == ' ' || *p->p == '\t' || *p->p == '\n' || *p->p == '\r') {
 		p->p++; p->len--;
@@ -75,9 +75,9 @@ int picolParseEol(struct picolParser *p) {
 int picolParseCommand(struct picolParser *p) {
 	int level = 1;
 	int blevel = 0;
-	p->start = ++p->p; p->len--;
+	p->start = ++p->p; p->len--;	// skip the [
 	while (1) {
-		if (p->len == 0) {
+		if (p->len <= 0) {
 			break;
 		} else if (*p->p == '[' && blevel == 0) {
 			level++;
@@ -121,7 +121,7 @@ int picolParseVar(struct picolParser *p)
 
 int picolParseBrace(struct picolParser *p) {
 	int level = 1;
-	p->start = ++p->p; p->len--;
+	p->start = ++p->p; p->len--;	// skip the opening brace
 	while(1) {
 		if (p->len >= 2 && *p->p == '\\') {
 			p->p++; p->len--;
@@ -147,7 +147,7 @@ int picolParseString(struct picolParser *p) {
 	if (newword && *p->p == '{') return picolParseBrace(p);
 	else if (newword && *p->p == '"') {
 		p->insidequote = 1;
-		p->p++; p->len--;
+		p->p++; p->len--;	// skip the quote
 	}
 	p->start = p->p;
 	while(1) {
@@ -189,8 +189,9 @@ int picolParseString(struct picolParser *p) {
 }
 
 int picolParseComment(struct picolParser *p) {
-	while(p->len && *p->p != '\n') {
-		p->p++; p->len--;
+	char *lp = p->p;	// last p
+	while(p->len && (*p->p != '\n' || *lp == '\\')) {
+		lp = p->p++; p->len--;
 	}
 	return PICOL_OK;
 }
@@ -305,11 +306,12 @@ int picolEval(struct picolInterp *i, char *t)
 	while(1) {
 		char *t;
 		int tlen;
-		int prevtype = p.type;
+		int prevtype;
+		prevtype = p.type;
 		picolGetToken(&p);
 		if (p.type == PT_EOF) 
 			break;
-		tlen = p.end-p.start+1;
+		tlen = p.end - p.start + 1;
 		if (tlen < 0) 
 			tlen = 0;
 		t = malloc(tlen+1);
@@ -334,7 +336,6 @@ int picolEval(struct picolInterp *i, char *t)
 		} else if (p.type == PT_ESC) {
 			/* XXX: escape handling missing! */
 		} else if (p.type == PT_SEP) {
-			prevtype = p.type;
 			free(t);
 			continue;
 		}
@@ -342,7 +343,6 @@ int picolEval(struct picolInterp *i, char *t)
 		if (p.type == PT_EOL) {
 			struct picolCmd *c;
 			free(t);
-			prevtype = p.type;
 			if (argc) {
 				if ((c = picolGetCommand(i,argv[0])) == NULL) {
 					snprintf(errbuf,1024,"No such command '%s'",argv[0]);
@@ -372,7 +372,6 @@ int picolEval(struct picolInterp *i, char *t)
 			argv[argc-1][oldlen+tlen]='\0';
 			free(t);
 		}
-		prevtype = p.type;
 	}
 err:
 	for (j = 0; j < argc; j++) 
