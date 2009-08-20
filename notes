@@ -1,4 +1,4 @@
-interpreter has a call level, call frame linked list, command linked list, and result string
+interpreter has a call level, call frame linked list, command linked list, and result string.
 
 level is initialized to 0, while an initial call frame is created, command list is NULL, and string is NULL.
 
@@ -7,8 +7,9 @@ A tcl variable has a name and value. Both are strings.
 
 The commands implemented are: +, -, *, /, >, >=, <, <=, ==, !=, set, puts, if, while, break, continue, proc, and return.  Isn't it crazy how much that covers?
 
-A command has a name string, function pointer, and a void pointer to "privdata". They are organized as linked lists.
+A command has a name string, function pointer, and a void pointer to "privdata". They are organized as linked lists.  None of the core commands use the privdata.
 
+Every time the eval function is called, a parser structure is created. A parser structure holds a pointer to the current text, the current location of parsing, the remaining length, start, end, and a flag to denote that we are inside quotes.  Also, there is a token type.  It is initialized to PT_EOL
 
 
 
@@ -24,3 +25,4 @@ Also, the empty string should not take up memory but it shouldn't break with fre
 
 I'd also like to use counted strings in my implementation instead of null terminated strings.
 I want to be able to redefine procs unlike the current code
+One idea for cacheing the value is to use some of the extra block bytes and a flag on the count byte
