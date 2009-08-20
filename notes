@@ -1,0 +1,26 @@
+interpreter has a call level, call frame linked list, command linked list, and result string
+
+level is initialized to 0, while an initial call frame is created, command list is NULL, and string is NULL.
+
+A call frame simply maintains a linked list of tcl variables
+A tcl variable has a name and value. Both are strings.
+
+The commands implemented are: +, -, *, /, >, >=, <, <=, ==, !=, set, puts, if, while, break, continue, proc, and return.  Isn't it crazy how much that covers?
+
+A command has a name string, function pointer, and a void pointer to "privdata". They are organized as linked lists.
+
+
+
+
+
+
+
+
+
+Notes:
+
+This code uses malloc for all of its allocations.  I need to come up with a block allocator that will prevent fragmentation while keeping wasted memory to a minimum.
+Also, the empty string should not take up memory but it shouldn't break with free.
+
+I'd also like to use counted strings in my implementation instead of null terminated strings.
+I want to be able to redefine procs unlike the current code

@@ -257,7 +257,7 @@ int picolSetVar(struct picolInterp *i, char *name, char *val) {
 		free(v->val);
 		v->val = strdup(val);
 	} else {
-		v = malloc(sizeof(*v));
+		v = malloc(sizeof(struct picolVar));
 		v->name = strdup(name);
 		v->val = strdup(val);
 		v->next = i->callframe->vars;
@@ -531,10 +531,10 @@ void picolRegisterCoreCommands(struct picolInterp *i) {
 	picolRegisterCommand(i,"return",picolCommandReturn,NULL);
 }
 
-int main(int argc, char **argv) {
+int main (int argc, char **argv) {
 	struct picolInterp interp;
-	picolInitInterp(&interp);
-	picolRegisterCoreCommands(&interp);
+	picolInitInterp (&interp);
+	picolRegisterCoreCommands (&interp);
 	if (argc == 1) {
 		while(1) {
 			char clibuf[1024];
