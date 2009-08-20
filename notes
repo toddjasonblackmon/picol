@@ -13,6 +13,25 @@ Every time the eval function is called, a parser structure is created. A parser 
 
 
 
+The parser tokenizes the stream first.  This basically involves going through left to right and defining each group of characters with a specific type.  Once a group of input characters is tokenized, they are effectively consumed, so the next token will start where the last left off. The tokens will also set start and end pointers to be used by the actual parsing of the token later.
+
+Examples
+0123456789012345678
+puts "Hello World"		TOK_ESC(0,3) TOK_SEP(4,4) TOK_ESC(6,16) TOK_EOL(18, 18)
+0123456789012345678901234567890123456789
+proc cubed {x} {[* $x [* $x $x]]}	
+TOK_ESC(0,3) TOK_SEP(4,4) TOK_ESC(5,9) TOK_SEP(10,10) 
+TOK_STR(12,12) TOK_SEP(13,13) TOK_STR(15,31) TOK_EOL(32,32)
+
+argv[0] = "proc"
+argv[1] = "cubed"
+argv[2] = "x"
+argv[3] = "[* $x [* $x $x]]"
+
+The argv[2] and arg[3] are stored in privdata as an array of 2 strings.
+
+
+
 
 
 
