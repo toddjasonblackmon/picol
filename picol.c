@@ -33,7 +33,7 @@ struct picolInterp {
 	char *result;
 };
 
-typedef int (*picolCmdFunc)(struct picolInterp *i, int argc, char **argv, void *privdata);
+typedef int (*picolCmdFunc) (struct picolInterp *i, int argc, char **argv, void *privdata);
 
 struct picolCmd {
 	char *name;
@@ -105,8 +105,8 @@ int picolParseVar(struct picolParser *p)
 	p->start = ++p->p; p->len--; /* skip the $ */
 	while ((*p->p >= 'a' && *p->p <= 'z') || (*p->p >= 'A' && *p->p <= 'Z') || 
 			(*p->p >= '0' && *p->p <= '9') || *p->p == '_') {
-			p->p++; 
-			p->len--;
+		p->p++; 
+		p->len--;
 	}
 
 	if (p->start == p->p) { /* It's just a single char string "$" */
@@ -157,31 +157,31 @@ int picolParseString(struct picolParser *p) {
 			return PICOL_OK;
 		}
 		switch(*p->p) {
-		case '\\':
-			if (p->len >= 2) {
-				p->p++; p->len--;
-			}
-			break;
-		case '$': case '[':
-			p->end = p->p-1;
-			p->type = PT_ESC;
-			return PICOL_OK;
-		case ' ': case '\t': case '\n': case '\r': case ';':
-			if (!p->insidequote) {
+			case '\\':
+				if (p->len >= 2) {
+					p->p++; p->len--;
+				}
+				break;
+			case '$': case '[':
 				p->end = p->p-1;
 				p->type = PT_ESC;
 				return PICOL_OK;
-			}
-			break;
-		case '"':
-			if (p->insidequote) {
-				p->end = p->p-1;
-				p->type = PT_ESC;
-				p->p++; p->len--;
-				p->insidequote = 0;
-				return PICOL_OK;
-			}
-			break;
+			case ' ': case '\t': case '\n': case '\r': case ';':
+				if (!p->insidequote) {
+					p->end = p->p-1;
+					p->type = PT_ESC;
+					return PICOL_OK;
+				}
+				break;
+			case '"':
+				if (p->insidequote) {
+					p->end = p->p-1;
+					p->type = PT_ESC;
+					p->p++; p->len--;
+					p->insidequote = 0;
+					return PICOL_OK;
+				}
+				break;
 		}
 		p->p++; p->len--;
 	}
@@ -206,24 +206,24 @@ int picolGetToken(struct picolParser *p) {
 			return PICOL_OK;
 		}
 		switch(*p->p) {
-		case ' ': case '\t': case '\r':
-			if (p->insidequote) return picolParseString(p);
-			return picolParseSep(p);
-		case '\n': case ';':
-			if (p->insidequote) return picolParseString(p);
-			return picolParseEol(p);
-		case '[':
-			return picolParseCommand(p);
-		case '$':
-			return picolParseVar(p);
-		case '#':
-			if (p->type == PT_EOL) {
-				picolParseComment(p);
-				continue;
-			}
-			return picolParseString(p);
-		default:
-			return picolParseString(p);
+			case ' ': case '\t': case '\r':
+				if (p->insidequote) return picolParseString(p);
+				return picolParseSep(p);
+			case '\n': case ';':
+				if (p->insidequote) return picolParseString(p);
+				return picolParseEol(p);
+			case '[':
+				return picolParseCommand(p);
+			case '$':
+				return picolParseVar(p);
+			case '#':
+				if (p->type == PT_EOL) {
+					picolParseComment(p);
+					continue;
+				}
+				return picolParseString(p);
+			default:
+				return picolParseString(p);
 		}
 	}
 	return PICOL_OK; /* unreached */

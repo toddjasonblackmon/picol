@@ -46,3 +46,5 @@ Also, the empty string should not take up memory but it shouldn't break with fre
 I'd also like to use counted strings in my implementation instead of null terminated strings.
 I want to be able to redefine procs unlike the current code
 One idea for cacheing the value is to use some of the extra block bytes and a flag on the count byte
+
+
